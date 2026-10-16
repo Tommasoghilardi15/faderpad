@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/icon.png">
+<link rel="stylesheet" href="/static/style.css">
+<title>Faderpad is running</title>
+<style>
+  body { align-items: center; justify-content: center; height: auto; min-height: 100%; -webkit-user-select: text; user-select: text; }
+  .connect {
+    width: min(760px, 100%); display: grid; grid-template-columns: 260px 1fr; gap: 32px; align-items: center;
+    padding: 32px; border-radius: 24px; background: var(--panel); border: 1px solid var(--line);
+  }
+  .qr { background: #fff; border-radius: 16px; padding: 14px; }
+  .qr img { display: block; width: 100%; height: auto; }
+  .connect h1 { margin-bottom: 8px; }
+  .connect p { margin: 0 0 16px; color: var(--text-dim); line-height: 1.5; }
+  .urls { margin: 0 0 18px; padding: 0; list-style: none; }
+  .urls li {
+    margin-bottom: 6px; padding: 10px 14px; border-radius: 10px; background: var(--raised);
+    font-size: 17px; font-weight: 600; font-variant-numeric: tabular-nums;
+  }
+  .facts { margin: 0; padding: 0; list-style: none; color: var(--text-dim); font-size: 14px; }
+  .facts li { margin-bottom: 6px; }
+  @media (max-width: 640px) { .connect { grid-template-columns: 1fr; } .qr { max-width: 260px; } }
+</style>
+</head>
+<body>
+  <section class="connect">
+    <div class="qr"><img src="/qr.svg" alt=""></div>
+    <div>
+      <h1 data-i18n="title">Faderpad is running</h1>
+      <p data-i18n="scan">Scan the code with your tablet or phone camera, or type this address in its browser. It has to be on the same Wi-Fi as this PC.</p>
+      <ul class="urls" id="urls"></ul>
+      <ul class="facts">
+        <li data-i18n="home">Tip: add the page to the Home Screen to open it full screen, like an app.</li>
+        <li id="pin"></li>
+        <li data-i18n="close">To stop Faderpad, close its window on this PC.</li>
+      </ul>
+    </div>
+  </section>
+<script>
+  const STRINGS = {
+    en: {
+      title: 'Faderpad is running',
+      scan: 'Scan the code with your tablet or phone camera, or type this address in its browser. It has to be on the same Wi-Fi as this PC.',
+      home: 'Tip: add the page to the Home Screen to open it full screen, like an app.',
+      close: 'To stop Faderpad, close its window on this PC.',
+      pinOn: 'PIN protection is on: other devices will ask for it once.',
+      pinOff: 'PIN protection is off: anyone on this network can open the mixer.',
+    },
+    it: {
+      title: 'Faderpad è acceso',
+      scan: 'Inquadra il codice con la fotocamera del tablet o del telefono, oppure scrivi questo indirizzo nel suo browser. Deve essere sulla stessa rete Wi-Fi di questo PC.',
+      home: 'Consiglio: aggiungi la pagina alla schermata Home per aprirla a schermo intero, come un\u2019app.',
+      close: 'Per spegnere Faderpad, chiudi la sua finestra su questo PC.',
+      pinOn: 'Il PIN è attivo: gli altri dispositivi lo chiederanno una volta.',
+      pinOff: 'Il PIN è spento: chiunque sia su questa rete può aprire il mixer.',
+    },
+  };
+  const T = STRINGS[(navigator.language || 'en').toLowerCase().startsWith('it') ? 'it' : 'en'];
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = T[el.dataset.i18n]; });
+  document.title = T.title;
+  fetch('/api/info').then(r => r.json()).then(info => {
+    const list = document.getElementById('urls');
+    for (const url of info.urls) {
+      const li = document.createElement('li');
+      li.textContent = url.replace('http://', '');
+      list.append(li);
+    }
+    document.getElementById('pin').textContent = info.pin_required ? T.pinOn : T.pinOff;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Faderpad">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="icon" href="/static/icon.png">
+<link rel="stylesheet" href="/static/style.css">
+<title>Faderpad</title>
+</head>
+<body>
+  <header class="top-bar">
+    <h1>Faderpad</h1>
+    <div class="status" id="status" role="status"><i></i><span data-i18n="connecting">Connecting…</span></div>
+  </header>
+
+  <main>
+    <div class="grid" id="grid"></div>
+    <p class="notice" id="notice"></p>
+  </main>
+
+  <footer class="players" id="players" hidden></footer>
+
+  <div class="pin-screen" id="pin-screen" hidden>
+    <form class="pin-box" id="pin-form">
+      <h2 data-i18n="pinTitle">Enter PIN</h2>
+      <p data-i18n="pinHint">Faderpad on this PC is protected by a PIN.</p>
+      <input id="pin-input" type="password" inputmode="numeric" autocomplete="off" required>
+      <button type="submit" data-i18n="pinButton">Unlock</button>
+      <div class="pin-error" id="pin-error" role="alert"></div>
+    </form>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
