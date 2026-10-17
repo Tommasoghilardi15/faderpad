@@ -38,11 +38,30 @@ Faderpad turns any tablet or phone into a touch mixer for Wave Link 3. It shows 
 1. Download **Faderpad.exe** from the [latest release](../../releases/latest).
 2. Open Wave Link, then double-click Faderpad.exe.
 3. The first time, Windows Firewall asks whether Faderpad may use the network. Allow it on private networks.
-4. A page with a QR code opens on the PC. Scan it with your tablet, or type the address it shows.
+4. The mixer opens in its own window on the PC. To connect a tablet or phone, click **Connect a device** and scan the QR code, or type the address it shows.
 
-Keep Faderpad's window open while you use it; close the window to stop it.
+<p align="center">
+  <img src="docs/window.png" width="720" alt="The Faderpad window on Windows, showing the Wave Link mixer">
+</p>
+
+Keep Faderpad's window open while you use it (minimising is fine); close the window to stop it. If something goes wrong, `faderpad.log` next to Faderpad.exe says why.
+
+The first time, a welcome screen asks whether Faderpad should start with Windows. You can change this later from the connection page (**Startup settings**).
+
+<p align="center">
+  <img src="docs/welcome.png" width="600" alt="The welcome screen with the option to start Faderpad with Windows">
+</p>
 
 Faderpad.exe isn't code-signed, so Windows SmartScreen may warn you the first time. Choose **More info**, then **Run anyway**.
+
+### Pin Faderpad to the taskbar
+
+To open Faderpad with one click, like any other app:
+
+1. Start Faderpad. Its icon appears in the taskbar.
+2. Right-click the icon and choose **Pin to taskbar**.
+
+You can also right-click **Faderpad.exe**, choose **Show more options**, then **Pin to taskbar**. Keep Faderpad.exe in a folder that won't change, such as `Documents\Faderpad`: if you move it, the pinned shortcut stops working and you have to pin it again.
 
 <p align="center">
   <img src="docs/connect.png" width="600" alt="The connection page with a QR code and the address to open">
@@ -64,7 +83,7 @@ Put a file named `faderpad.json` next to Faderpad.exe (there is an example in [`
 | --- | --- | --- |
 | `port` | `5757` | The port the tablet connects to. Change it if something else already uses 5757. |
 | `pin` | none | Other devices must enter this PIN once before they can control anything. The PC itself never needs it. |
-| `open_browser` | `true` | Open the QR code page on the PC when Faderpad starts. |
+| `open_browser` | `true` | Open the Faderpad window on the PC when it starts. Set to `false` to just run the server. |
 
 The same options work on the command line: `Faderpad.exe --port 6000 --pin 1234 --no-browser`. Run `Faderpad.exe --help` for the full list.
 

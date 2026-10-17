@@ -10,6 +10,7 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 
 from . import __version__
 from .background import Background
+from . import setup
 from .media import MediaController
 from .wavelink import WaveLink
 
@@ -55,6 +56,10 @@ def create_app(pin=None, urls=()):
     def connect():
         return send_from_directory(WEB_DIR, "connect.html")
 
+    @app.get("/welcome")
+    def welcome():
+        return send_from_directory(WEB_DIR, "welcome.html")
+
     @app.get("/apple-touch-icon.png")
     def touch_icon():
         return send_from_directory(WEB_DIR, "icon.png")
@@ -87,6 +92,27 @@ def create_app(pin=None, urls=()):
         response = jsonify(ok=True)
         response.set_cookie(PIN_COOKIE, token, max_age=60 * 60 * 24 * 365, httponly=True, samesite="Strict")
         return response
+
+    # ---------- setup (only from the PC itself) ----------
+
+    @app.get("/api/setup")
+    def get_setup():
+        if request.remote_addr not in LOCAL_ADDRESSES:
+            return _error("forbidden", 403)
+        return jsonify(supported=setup.supported(), autostart=setup.autostart_enabled())
+
+    @app.post("/api/setup")
+    def set_setup():
+        if request.remote_addr not in LOCAL_ADDRESSES:
+            return _error("forbidden", 403)
+        body = request.get_json(silent=True) or {}
+        try:
+            if "autostart" in body:
+                setup.set_autostart(bool(body["autostart"]))
+            setup.mark_done()
+        except OSError as e:
+            return _error("setup_failed", 500, f"{type(e).__name__}: {e}")
+        return jsonify(ok=True)
 
     # ---------- Wave Link ----------
 

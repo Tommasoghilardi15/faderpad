@@ -7,6 +7,7 @@
   const STRINGS = {
     en: {
       connecting: 'Connecting…',
+      connectLink: 'Connect a device',
       general: 'General',
       generalSub: 'Channel volume',
       mixVolume: 'Mix volume',
@@ -32,6 +33,7 @@
     },
     it: {
       connecting: 'Collegamento…',
+      connectLink: 'Collega un dispositivo',
       general: 'Generale',
       generalSub: 'Volume del canale',
       mixVolume: 'Volume del mix',
@@ -88,6 +90,8 @@
   };
 
   const $ = id => document.getElementById(id);
+  // Only on the PC itself (the Faderpad window): other devices don't need the QR page.
+  if (['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname)) $('connect-link').hidden = false;
   const div = cls => { const el = document.createElement('div'); el.className = cls; return el; };
 
   /* ---------- state ---------- */

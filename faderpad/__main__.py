@@ -2,6 +2,7 @@
 import argparse
 import json
 import logging
+import os
 import socket
 import sys
 import threading
@@ -11,10 +12,12 @@ from pathlib import Path
 from werkzeug.serving import make_server
 
 from . import __version__
+from . import setup
 from .server import create_app
 
 DEFAULT_PORT = 5757
 CONFIG_NAME = "faderpad.json"
+LOG_NAME = "faderpad.log"
 
 
 def base_dir():
@@ -59,13 +62,39 @@ def lan_addresses():
     return [a for a in found if not a.startswith(("127.", "169.254."))] or ["127.0.0.1"]
 
 
-def wait_before_closing():
-    # A double-clicked .exe closes its window immediately; keep errors readable.
-    if getattr(sys, "frozen", False):
-        input("\nPress Enter to close...")
+def setup_log():
+    """The .exe has no console, so print() would crash: send all output to faderpad.log instead."""
+    if not getattr(sys, "frozen", False):
+        return
+    try:
+        log = open(base_dir() / LOG_NAME, "w", encoding="utf-8", buffering=1)
+    except OSError:
+        log = open(os.devnull, "w")
+    sys.stdout = sys.stderr = log
+
+
+def alert(text):
+    """Tell the user something when there is no console to print to."""
+    print(text)
+    if getattr(sys, "frozen", False) and sys.platform == "win32":
+        import ctypes
+        ctypes.windll.user32.MessageBoxW(None, text, "Faderpad", 0x10)
+
+
+def show_window(url):
+    """Open Faderpad's own window and wait until it is closed. Returns False if that isn't possible."""
+    try:
+        import webview
+        webview.create_window("Faderpad", url, width=1100, height=700, min_size=(480, 420))
+        webview.start()
+        return True
+    except Exception as e:  # e.g. Edge WebView2 missing: fall back to the browser
+        print(f"Could not open the app window ({type(e).__name__}: {e}), using the browser instead.")
+        return False
 
 
 def main(argv=None):
+    setup_log()
     try:
         sys.stdout.reconfigure(line_buffering=True)  # show messages right away, even when redirected
     except Exception:
@@ -83,7 +112,7 @@ def main(argv=None):
                         help="ask other devices for this PIN before they can control anything")
     parser.add_argument("--no-browser", action="store_true",
                         default=not config.get("open_browser", True),
-                        help="don't open the connection page on this PC at start")
+                        help="don't open the Faderpad window on this PC (the server just runs)")
     parser.add_argument("--version", action="version", version=f"Faderpad {__version__}")
     args = parser.parse_args(argv)
     pin = str(args.pin) if args.pin not in (None, "") else None
@@ -98,9 +127,8 @@ def main(argv=None):
     try:
         server = make_server(args.host, args.port, app, threaded=True)
     except OSError:
-        print(f"Port {args.port} is already in use. Is Faderpad already running?")
-        print("Close the other copy, or start Faderpad on another port with --port.")
-        wait_before_closing()
+        alert(f"Port {args.port} is already in use. Is Faderpad already running?\n"
+              "Close the other copy, or start Faderpad on another port with --port.")
         return 1
 
     print(f"Faderpad {__version__}")
@@ -110,14 +138,23 @@ def main(argv=None):
         print(f"  {url}")
     print()
     print(f"PIN: {'on' if pin else 'off'}")
-    print("Keep this window open. Close it to stop Faderpad.")
+    print("Close the Faderpad window to stop it.")
 
-    if not args.no_browser:
-        threading.Timer(0.8, webbrowser.open, args=(f"http://127.0.0.1:{args.port}/connect",)).start()
+    setup.refresh_autostart()
+    threading.Thread(target=server.serve_forever, daemon=True).start()
     try:
-        server.serve_forever()
+        opened = False
+        if not args.no_browser:
+            # Closing the window closes Faderpad: serve_forever runs in a daemon thread and dies with us.
+            first_page = "welcome" if setup.supported() and not setup.is_done() else ""
+            opened = show_window(f"http://127.0.0.1:{args.port}/{first_page}")
+            if not opened:
+                webbrowser.open(f"http://127.0.0.1:{args.port}/")
+        if not opened:
+            threading.Event().wait()  # no window: keep serving until Ctrl+C
     except KeyboardInterrupt:
         pass
+    server.shutdown()
     return 0
 
 

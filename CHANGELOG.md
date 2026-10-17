@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.0
+
+- Faderpad now opens in its own window with the mixer, like a normal app, instead of a terminal. You can pin it to the taskbar; closing the window stops Faderpad.
+- A welcome screen on the first start lets you choose "Start Faderpad with Windows". The choice can be changed later from the connect page.
+- A "Connect a device" button in the window leads to the QR code page, which has a link back to the mixer.
+- Messages go to `faderpad.log` next to the .exe, and a startup problem (such as the port being in use) shows a message box.
+- If the window can't open (Edge WebView2 missing), the mixer opens in the browser instead.
+
 ## 1.0.0
 
 First public release.

@@ -38,11 +38,34 @@ Faderpad trasforma qualsiasi tablet o telefono in un mixer touch per Wave Link 3
 1. Scarica **Faderpad.exe** dall'[ultima release](../../releases/latest).
 2. Apri Wave Link, poi fai doppio clic su Faderpad.exe.
 3. La prima volta Windows Firewall chiede se Faderpad può usare la rete: consentilo sulle reti private.
-4. Sul PC si apre una pagina con un QR code. Inquadralo con il tablet, oppure scrivi l'indirizzo che mostra.
+4. Sul PC si apre il mixer in una finestra tutta sua. Per collegare un tablet o un telefono, premi **Collega un dispositivo** e inquadra il QR code, oppure scrivi l'indirizzo che mostra.
 
-Tieni aperta la finestra di Faderpad mentre lo usi; chiudila per spegnerlo.
+<p align="center">
+  <img src="docs/window.png" width="720" alt="La finestra di Faderpad su Windows, con il mixer di Wave Link">
+</p>
+
+Tieni aperta la finestra di Faderpad mentre lo usi (ridurla a icona va bene); chiudila per spegnerlo. Se qualcosa non va, il file `faderpad.log` accanto a Faderpad.exe spiega perché.
+
+La prima volta una schermata di benvenuto chiede se Faderpad deve avviarsi con Windows. Puoi cambiare idea in seguito dalla pagina di collegamento (**Impostazioni di avvio**).
+
+<p align="center">
+  <img src="docs/welcome.png" width="600" alt="La schermata di benvenuto con l'opzione per avviare Faderpad con Windows">
+</p>
 
 Faderpad.exe non ha una firma digitale, quindi la prima volta Windows SmartScreen potrebbe avvisarti. Scegli **Ulteriori informazioni**, poi **Esegui comunque**.
+
+### Fissare Faderpad alla barra delle applicazioni
+
+Per aprire Faderpad con un clic, come qualsiasi altra app:
+
+1. Avvia Faderpad. La sua icona compare nella barra delle applicazioni.
+2. Fai clic destro sull'icona e scegli **Aggiungi alla barra delle applicazioni**.
+
+Puoi anche fare clic destro su **Faderpad.exe**, scegliere **Mostra altre opzioni** e poi **Aggiungi alla barra delle applicazioni**. Tieni Faderpad.exe in una cartella che non cambia, per esempio `Documenti\Faderpad`: se lo sposti, il collegamento fissato smette di funzionare e va fissato di nuovo.
+
+<p align="center">
+  <img src="docs/connect.png" width="600" alt="La pagina di collegamento con il QR code e l'indirizzo da aprire">
+</p>
 
 ## Impostazioni
 
@@ -60,7 +83,7 @@ Metti un file chiamato `faderpad.json` accanto a Faderpad.exe (c'è un esempio i
 | --- | --- | --- |
 | `port` | `5757` | La porta a cui si collega il tablet. Cambiala se 5757 è già usata da altro. |
 | `pin` | nessuno | Gli altri dispositivi devono inserire questo PIN una volta prima di poter comandare qualcosa. Il PC stesso non lo chiede mai. |
-| `open_browser` | `true` | All'avvio apre sul PC la pagina con il QR code. |
+| `open_browser` | `true` | All'avvio apre la finestra di Faderpad sul PC. Con `false` parte solo il server. |
 
 Le stesse opzioni funzionano da riga di comando: `Faderpad.exe --port 6000 --pin 1234 --no-browser`. Con `Faderpad.exe --help` vedi l'elenco completo.
 

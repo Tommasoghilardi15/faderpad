@@ -11,6 +11,7 @@ hiddenimports = [
     "winrt.windows.media",
     "winrt.windows.media.control",
     "winrt.windows.storage.streams",
+    "webview.platforms.edgechromium",
 ]
 
 # The winrt packages ship compiled modules; collect them all so media controls work in the .exe.
@@ -39,6 +40,6 @@ exe = EXE(
     [],
     name="Faderpad",
     icon="assets/icon.ico",
-    console=True,
+    console=False,
     upx=False,
 )

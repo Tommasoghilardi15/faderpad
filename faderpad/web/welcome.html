@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="/static/icon.png">
+<link rel="stylesheet" href="/static/style.css">
+<title>Faderpad</title>
+<style>
+  body { align-items: center; justify-content: center; height: auto; min-height: 100%; }
+  .welcome {
+    width: min(520px, 100%); padding: 32px; border-radius: 24px; background: var(--panel); border: 1px solid var(--line);
+  }
+  .welcome h1 { margin-bottom: 8px; }
+  .welcome p { margin: 0 0 20px; color: var(--text-dim); line-height: 1.5; }
+  .option {
+    display: flex; gap: 14px; align-items: flex-start; margin-bottom: 24px; padding: 14px; cursor: pointer;
+    border-radius: 14px; background: var(--raised);
+  }
+  .option input { width: 22px; height: 22px; margin: 2px 0 0; flex: none; accent-color: var(--accent); }
+  .option strong { display: block; margin-bottom: 2px; }
+  .option small { color: var(--text-dim); font-size: 13px; }
+  .go {
+    width: 100%; padding: 12px; border: 0; border-radius: 12px; font-weight: 600; font-size: 16px;
+    background: var(--accent); color: #fff;
+  }
+  .error { margin-top: 12px; color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+  <section class="welcome">
+    <h1 data-i18n="title">Welcome to Faderpad</h1>
+    <p data-i18n="intro">Choose how Faderpad should behave on this PC. You can change this later.</p>
+    <label class="option">
+      <input type="checkbox" id="autostart">
+      <span>
+        <strong data-i18n="autostart">Start Faderpad with Windows</strong>
+        <small data-i18n="autostartHint">Faderpad opens by itself when you turn on the PC, so your tablet is ready to use.</small>
+      </span>
+    </label>
+    <button class="go" id="go" data-i18n="go">Continue</button>
+    <div class="error" id="error" role="alert"></div>
+  </section>
+<script>
+  const STRINGS = {
+    en: {
+      title: 'Welcome to Faderpad',
+      intro: 'Choose how Faderpad should behave on this PC. You can change this later.',
+      autostart: 'Start Faderpad with Windows',
+      autostartHint: 'Faderpad opens by itself when you turn on the PC, so your tablet is ready to use.',
+      go: 'Continue',
+      failed: 'Couldn’t save the choice. Try again.',
+    },
+    it: {
+      title: 'Benvenuto in Faderpad',
+      intro: 'Scegli come deve comportarsi Faderpad su questo PC. Potrai cambiare idea dopo.',
+      autostart: 'Avvia Faderpad con Windows',
+      autostartHint: 'Faderpad si apre da solo quando accendi il PC, così il tablet è subito pronto.',
+      go: 'Continua',
+      failed: 'Non sono riuscito a salvare la scelta. Riprova.',
+    },
+  };
+  const T = STRINGS[(navigator.language || 'en').toLowerCase().startsWith('it') ? 'it' : 'en'];
+  document.documentElement.lang = navigator.language.toLowerCase().startsWith('it') ? 'it' : 'en';
+  document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = T[el.dataset.i18n]; });
+  const box = document.getElementById('autostart');
+  fetch('/api/setup').then(r => r.json()).then(s => { box.checked = !!s.autostart; });
+  document.getElementById('go').addEventListener('click', () => {
+    fetch('/api/setup', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ autostart: box.checked }),
+    }).then(r => { if (!r.ok) throw new Error(); location.href = '/'; })
+      .catch(() => { document.getElementById('error').textContent = T.failed; });
+  });
+</script>
+</body>
+</html>
